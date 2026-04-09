@@ -1,0 +1,125 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI';
+    display: flex;
+    background: #fdf6f9; /* rosado pastel */
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: #d8c4f7; /* lila pastel */
+    color: #333;
+    height: 100vh;
+    padding: 20px;
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: #f3e8ff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.sidebar button:hover {
+    background: #e9d5ff;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #ffffff;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #f3e8ff;
+}
+
+/* CARDS */
+.cards {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: #fff0f6;
+    padding: 20px;
+    border-radius: 12px;
+    flex: 1;
+    text-align: center;
+}
+
+/* FORM */
+.container {
+    padding: 20px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e9d5ff;
+}
+
+/* BOTONES */
+button {
+    background: #cdb4db;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #bde0fe;
+}
+
+/* PRODUCTOS */
+.productos {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.producto {
+    background: #ffffff;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 12px;
+    width: 180px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.producto img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+/* CARRITO */
+#carritoLista div {
+    background: #fff0f6;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+/* BOTON ELIMINAR */
+#carritoLista button {
+    background: #ffafcc;
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+#carritoLista button:hover {
+    background: #ffc8dd;
+}

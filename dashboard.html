@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SofSport PRO</title>
+
+<style>
+body{margin:0;font-family:'Segoe UI';display:flex;background:#f5f6fa}
+
+/* SIDEBAR */
+.sidebar{
+width:230px;
+background:linear-gradient(180deg,#7b2ff7,#a100ff);
+color:white;
+height:100vh;
+padding:20px;
+}
+.sidebar button{
+width:100%;
+padding:12px;
+margin:10px 0;
+background:none;
+border:none;
+color:white;
+text-align:left;
+border-radius:8px;
+cursor:pointer;
+}
+.sidebar button:hover{background:rgba(255,255,255,0.2)}
+
+/* MAIN */
+.main{flex:1}
+
+/* NAV */
+.navbar{
+background:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+}
+
+/* PRODUCTOS */
+.productos{display:flex;flex-wrap:wrap;padding:20px}
+.producto{
+background:white;
+margin:10px;
+padding:10px;
+border-radius:10px;
+width:180px;
+text-align:center;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+.producto img{width:100px;height:100px;object-fit:cover}
+
+/* FORM */
+.container{padding:20px}
+input{padding:8px;margin:5px}
+
+/* USUARIOS */
+.item{
+background:white;
+padding:10px;
+margin:10px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+button{
+background:#7b2ff7;
+color:white;
+border:none;
+padding:6px;
+border-radius:6px;
+cursor:pointer;
+margin:2px;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+if(!localStorage.getItem("sesion")){
+    window.location="index.html";
+}
+</script>
+
+<div class="sidebar">
+<h2>Inventario Deportivo</h2>
+<button onclick="ver('productos')">📦 Inventario</button>
+<button onclick="ver('carrito')">🛒 Carrito</button>
+<button onclick="ver('usuarios')">👤 Usuarios</button>
+<button onclick="logout()">🚪 Cerrar sesión</button>
+</div>
+
+<div class="main">
+
+<div class="navbar">
+<strong>SofSport Dashboard</strong>
+</div>
+
+<!-- PRODUCTOS -->
+<div id="productos" class="container">
+<h3>Agregar Producto</h3>
+
+<input id="nombre" placeholder="Nombre">
+<input id="cantidad" placeholder="Cantidad">
+<input id="precio" placeholder="Precio">
+<input type="file" id="imagen" accept="image/png">
+
+<button onclick="guardar()">Guardar</button>
+
+<div id="lista" class="productos"></div>
+</div>
+
+<!-- CARRITO -->
+<div id="carrito" style="display:none" class="container">
+<h2>🛒 Carrito</h2>
+<div id="carritoLista"></div>
+<button onclick="vaciarCarrito()">Vaciar carrito</button>
+</div>
+
+<!-- USUARIOS -->
+<div id="usuarios" style="display:none" class="container">
+<h2>👤 Usuarios</h2>
+
+<input id="userNombre" placeholder="Nombre">
+<input id="userPass" placeholder="Contraseña">
+
+<button onclick="guardarUsuario()">Guardar</button>
+
+<div id="listaUsuarios"></div>
+</div>
+
+</div>
+
+<script>
+let productos = JSON.parse(localStorage.getItem("productos")) || [];
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+let editUser = null;
+
+/* NAV */
+function ver(id){
+["productos","carrito","usuarios"].forEach(v=>{
+document.getElementById(v).style.display="none";
+});
+document.getElementById(id).style.display="block";
+}
+
+/* LOGOUT */
+function logout(){
+localStorage.removeItem("sesion");
+window.location="index.html";
+}
+
+/* PRODUCTOS */
+function guardar(){
+let n=nombre.value,c=cantidad.value,p=precio.value,f=imagen.files[0];
+
+if(!f){
+alert("Sube imagen");
+return;
+}
+
+let r=new FileReader();
+r.onload=e=>{
+productos.push({nombre:n,cantidad:c,precio:p,imagen:e.target.result});
+localStorage.setItem("productos", JSON.stringify(productos));
+mostrar();
+};
+r.readAsDataURL(f);
+}
+
+function mostrar(){
+lista.innerHTML="";
+productos.forEach((p,i)=>{
+lista.innerHTML+=`
+<div class="producto">
+<img src="${p.imagen}">
+<h4>${p.nombre}</h4>
+<p>📦 ${p.cantidad}</p>
+<p>💰 $${p.precio}</p>
+<button onclick="comprar(${i})">🛒</button>
+<button onclick="eliminar(${i})">❌</button>
+</div>`;
+});
+}
+
+function eliminar(i){
+productos.splice(i,1);
+localStorage.setItem("productos", JSON.stringify(productos));
+mostrar();
+}
+
+/* CARRITO */
+function comprar(i){
+carrito.push(productos[i]);
+localStorage.setItem("carrito", JSON.stringify(carrito));
+mostrarCarrito();
+}
+
+function mostrarCarrito(){
+carritoLista.innerHTML="";
+carrito.forEach((p,i)=>{
+carritoLista.innerHTML+=`
+<div class="item">
+<p>${p.nombre} - $${p.precio}</p>
+<button onclick="eliminarCarrito(${i})">❌</button>
+</div>`;
+});
+}
+
+function eliminarCarrito(i){
+carrito.splice(i,1);
+localStorage.setItem("carrito", JSON.stringify(carrito));
+mostrarCarrito();
+}
+
+function vaciarCarrito(){
+carrito=[];
+localStorage.setItem("carrito","[]");
+mostrarCarrito();
+}
+
+/* USUARIOS */
+function guardarUsuario(){
+let n=userNombre.value,p=userPass.value;
+
+if(editUser==null){
+usuarios.push({nombre:n,pass:p});
+}else{
+usuarios[editUser]={nombre:n,pass:p};
+editUser=null;
+}
+
+localStorage.setItem("usuarios", JSON.stringify(usuarios));
+mostrarUsuarios();
+limpiarUsuarios();
+}
+
+function mostrarUsuarios(){
+listaUsuarios.innerHTML="";
+usuarios.forEach((u,i)=>{
+listaUsuarios.innerHTML+=`
+<div class="item">
+<p><strong>${u.nombre}</strong></p>
+<p>${u.pass}</p>
+
+<button onclick="editarUsuario(${i})">✏️ Editar</button>
+<button onclick="eliminarUsuario(${i})">❌ Eliminar</button>
+</div>`;
+});
+}
+
+function editarUsuario(i){
+let u=usuarios[i];
+userNombre.value=u.nombre;
+userPass.value=u.pass;
+editUser=i;
+}
+
+function eliminarUsuario(i){
+if(confirm("¿Eliminar usuario?")){
+usuarios.splice(i,1);
+localStorage.setItem("usuarios", JSON.stringify(usuarios));
+mostrarUsuarios();
+}
+}
+
+function limpiarUsuarios(){
+userNombre.value="";
+userPass.value="";
+}
+
+/* INIT */
+mostrar();
+mostrarCarrito();
+mostrarUsuarios();
+</script>
+
+</body>
+</html>
