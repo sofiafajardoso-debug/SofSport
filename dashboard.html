@@ -1,20 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>SofSport PRO</title>
 
 <style>
-body{margin:0;font-family:'Segoe UI';display:flex;background:#f5f6fa}
 
-/* SIDEBAR */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI';
+}
+
+body{
+background:#f5f6fa;
+display:flex;
+}
+
+/* =========================
+MENU HAMBURGUESA
+========================= */
+
+.menu-btn{
+position:fixed;
+top:15px;
+left:15px;
+background:#7b2ff7;
+color:white;
+border:none;
+padding:10px 14px;
+font-size:22px;
+border-radius:8px;
+cursor:pointer;
+z-index:2000;
+display:none;
+}
+
+/* =========================
+SIDEBAR
+========================= */
+
 .sidebar{
 width:230px;
 background:linear-gradient(180deg,#7b2ff7,#a100ff);
 color:white;
 height:100vh;
 padding:20px;
+transition:0.3s;
+position:fixed;
+left:0;
+top:0;
+z-index:1000;
+overflow:auto;
 }
+
+.sidebar h2{
+margin-bottom:20px;
+}
+
 .sidebar button{
 width:100%;
 padding:12px;
@@ -25,73 +72,192 @@ color:white;
 text-align:left;
 border-radius:8px;
 cursor:pointer;
+font-size:15px;
 }
-.sidebar button:hover{background:rgba(255,255,255,0.2)}
 
-/* MAIN */
-.main{flex:1}
+.sidebar button:hover{
+background:rgba(255,255,255,0.2);
+}
 
-/* NAV */
+/* =========================
+RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+.menu-btn{
+display:block;
+}
+
+.sidebar{
+left:-250px;
+}
+
+.sidebar.active{
+left:0;
+}
+
+.main{
+margin-left:0;
+width:100%;
+}
+
+}
+
+/* =========================
+MAIN
+========================= */
+
+.main{
+flex:1;
+margin-left:230px;
+width:100%;
+}
+
+/* =========================
+NAVBAR
+========================= */
+
 .navbar{
 background:white;
-padding:15px;
+padding:20px;
 display:flex;
 justify-content:space-between;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* PRODUCTOS */
-.productos{display:flex;flex-wrap:wrap;padding:20px}
+/* =========================
+CONTAINER
+========================= */
+
+.container{
+padding:20px;
+}
+
+/* =========================
+PRODUCTOS
+========================= */
+
+.productos{
+display:flex;
+flex-wrap:wrap;
+}
+
 .producto{
 background:white;
 margin:10px;
-padding:10px;
+padding:15px;
 border-radius:10px;
-width:180px;
+width:200px;
 text-align:center;
 box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
-.producto img{width:100px;height:100px;object-fit:cover}
 
-/* FORM */
-.container{padding:20px}
-input{padding:8px;margin:5px}
+.producto img{
+width:100px;
+height:100px;
+object-fit:cover;
+border-radius:10px;
+}
 
-/* USUARIOS */
+.producto h4{
+margin:10px 0;
+}
+
+/* =========================
+FORMULARIOS
+========================= */
+
+input{
+padding:10px;
+margin:5px;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+/* =========================
+ITEMS
+========================= */
+
 .item{
 background:white;
-padding:10px;
-margin:10px;
+padding:15px;
+margin:10px 0;
 border-radius:10px;
 box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
+
+/* =========================
+BOTONES
+========================= */
 
 button{
 background:#7b2ff7;
 color:white;
 border:none;
-padding:6px;
+padding:8px 12px;
 border-radius:6px;
 cursor:pointer;
 margin:2px;
 }
+
+button:hover{
+background:#5e22bf;
+}
+
+/* =========================
+FOOTER
+========================= */
+
+footer{
+background:#7b2ff7;
+color:white;
+text-align:center;
+padding:15px;
+margin-top:30px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<script>
-if(!localStorage.getItem("sesion")){
-    window.location="index.html";
-}
-</script>
+<!-- MENU -->
 
-<div class="sidebar">
+<button class="menu-btn" onclick="toggleMenu()">
+☰
+</button>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar" id="sidebar">
+
 <h2>Inventario Deportivo</h2>
-<button onclick="ver('productos')">📦 Inventario</button>
-<button onclick="ver('carrito')">🛒 Carrito</button>
-<button onclick="ver('usuarios')">👤 Usuarios</button>
-<button onclick="logout()">🚪 Cerrar sesión</button>
+
+<button onclick="ver('productos')">
+📦 Inventario
+</button>
+
+<button onclick="ver('carrito')">
+🛒 Carrito
+</button>
+
+<button onclick="ver('usuarios')">
+👤 Usuarios
+</button>
+
+<button onclick="ver('reportes')">
+📊 Reportes
+</button>
+
+<button onclick="logout()">
+🚪 Cerrar sesión
+</button>
+
 </div>
+
+<!-- MAIN -->
 
 <div class="main">
 
@@ -100,184 +266,478 @@ if(!localStorage.getItem("sesion")){
 </div>
 
 <!-- PRODUCTOS -->
+
 <div id="productos" class="container">
+
 <h3>Agregar Producto</h3>
 
 <input id="nombre" placeholder="Nombre">
-<input id="cantidad" placeholder="Cantidad">
-<input id="precio" placeholder="Precio">
-<input type="file" id="imagen" accept="image/png">
 
-<button onclick="guardar()">Guardar</button>
+<input id="cantidad" type="number" placeholder="Cantidad">
+
+<input id="precio" type="number" placeholder="Precio">
+
+<input type="file" id="imagen" accept="image/*">
+
+<button onclick="guardar()">
+Guardar
+</button>
 
 <div id="lista" class="productos"></div>
+
 </div>
 
 <!-- CARRITO -->
+
 <div id="carrito" style="display:none" class="container">
+
 <h2>🛒 Carrito</h2>
+
 <div id="carritoLista"></div>
-<button onclick="vaciarCarrito()">Vaciar carrito</button>
+
+<button onclick="vaciarCarrito()">
+Vaciar carrito
+</button>
+
 </div>
 
 <!-- USUARIOS -->
+
 <div id="usuarios" style="display:none" class="container">
+
 <h2>👤 Usuarios</h2>
 
 <input id="userNombre" placeholder="Nombre">
-<input id="userPass" placeholder="Contraseña">
 
-<button onclick="guardarUsuario()">Guardar</button>
+<input id="userPass" type="password" placeholder="Contraseña">
+
+<button onclick="guardarUsuario()">
+Guardar
+</button>
 
 <div id="listaUsuarios"></div>
+
 </div>
+
+<!-- REPORTES -->
+
+<div id="reportes" style="display:none" class="container">
+
+<h2>📊 Reportes</h2>
+
+<div class="item">
+<p>
+<strong>Total de productos:</strong>
+<span id="repProductos">0</span>
+</p>
+</div>
+
+<div class="item">
+<p>
+<strong>Productos en carrito:</strong>
+<span id="repCarrito">0</span>
+</p>
+</div>
+
+<div class="item">
+<p>
+<strong>Total en ventas:</strong>
+$<span id="repVentas">0</span>
+</p>
+</div>
+
+</div>
+
+<footer>
+SofSport © 2026
+</footer>
 
 </div>
 
 <script>
+
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
+
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 
 let editUser = null;
 
-/* NAV */
+/* =========================
+MENU
+========================= */
+
+function toggleMenu(){
+
+document.getElementById("sidebar").classList.toggle("active");
+
+}
+
+/* =========================
+NAVEGACION
+========================= */
+
 function ver(id){
-["productos","carrito","usuarios"].forEach(v=>{
+
+const secciones = ["productos","carrito","usuarios","reportes"];
+
+secciones.forEach(v=>{
+
 document.getElementById(v).style.display="none";
+
 });
+
 document.getElementById(id).style.display="block";
+
+if(window.innerWidth <= 768){
+
+document.getElementById("sidebar").classList.remove("active");
+
 }
 
-/* LOGOUT */
+}
+
+/* =========================
+LOGOUT
+========================= */
+
 function logout(){
+
 localStorage.removeItem("sesion");
-window.location="index.html";
+
+alert("Sesión cerrada");
+
 }
 
-/* PRODUCTOS */
+/* =========================
+PRODUCTOS
+========================= */
+
 function guardar(){
-let n=nombre.value,c=cantidad.value,p=precio.value,f=imagen.files[0];
+
+let n = document.getElementById("nombre").value.trim();
+
+let c = document.getElementById("cantidad").value.trim();
+
+let p = document.getElementById("precio").value.trim();
+
+let f = document.getElementById("imagen").files[0];
+
+if(n === "" || c === "" || p === ""){
+
+alert("Completa todos los campos");
+
+return;
+
+}
 
 if(!f){
-alert("Sube imagen");
+
+alert("Sube una imagen");
+
 return;
+
 }
 
-let r=new FileReader();
-r.onload=e=>{
-productos.push({nombre:n,cantidad:c,precio:p,imagen:e.target.result});
+let r = new FileReader();
+
+r.onload = function(e){
+
+productos.push({
+
+nombre:n,
+cantidad:c,
+precio:p,
+imagen:e.target.result
+
+});
+
 localStorage.setItem("productos", JSON.stringify(productos));
+
 mostrar();
+
+actualizarReportes();
+
+limpiarProducto();
+
 };
+
 r.readAsDataURL(f);
+
 }
 
 function mostrar(){
-lista.innerHTML="";
+
+let lista = document.getElementById("lista");
+
+lista.innerHTML = "";
+
 productos.forEach((p,i)=>{
-lista.innerHTML+=`
+
+lista.innerHTML += `
+
 <div class="producto">
-<img src="${p.imagen}">
+
+<img src="${p.imagen}" alt="producto">
+
 <h4>${p.nombre}</h4>
+
 <p>📦 ${p.cantidad}</p>
+
 <p>💰 $${p.precio}</p>
-<button onclick="comprar(${i})">🛒</button>
-<button onclick="eliminar(${i})">❌</button>
-</div>`;
+
+<button onclick="comprar(${i})">
+🛒
+</button>
+
+<button onclick="eliminar(${i})">
+❌
+</button>
+
+</div>
+
+`;
+
 });
+
+}
+
+function limpiarProducto(){
+
+document.getElementById("nombre").value = "";
+document.getElementById("cantidad").value = "";
+document.getElementById("precio").value = "";
+document.getElementById("imagen").value = "";
+
 }
 
 function eliminar(i){
+
 productos.splice(i,1);
+
 localStorage.setItem("productos", JSON.stringify(productos));
+
 mostrar();
+
+actualizarReportes();
+
 }
 
-/* CARRITO */
+/* =========================
+CARRITO
+========================= */
+
 function comprar(i){
+
 carrito.push(productos[i]);
+
 localStorage.setItem("carrito", JSON.stringify(carrito));
+
 mostrarCarrito();
+
+actualizarReportes();
+
 }
 
 function mostrarCarrito(){
-carritoLista.innerHTML="";
+
+let carritoLista = document.getElementById("carritoLista");
+
+carritoLista.innerHTML = "";
+
 carrito.forEach((p,i)=>{
-carritoLista.innerHTML+=`
+
+carritoLista.innerHTML += `
+
 <div class="item">
+
 <p>${p.nombre} - $${p.precio}</p>
-<button onclick="eliminarCarrito(${i})">❌</button>
-</div>`;
+
+<button onclick="eliminarCarrito(${i})">
+❌
+</button>
+
+</div>
+
+`;
+
 });
+
 }
 
 function eliminarCarrito(i){
+
 carrito.splice(i,1);
+
 localStorage.setItem("carrito", JSON.stringify(carrito));
+
 mostrarCarrito();
+
+actualizarReportes();
+
 }
 
 function vaciarCarrito(){
-carrito=[];
-localStorage.setItem("carrito","[]");
+
+carrito = [];
+
+localStorage.setItem("carrito", JSON.stringify(carrito));
+
 mostrarCarrito();
+
+actualizarReportes();
+
 }
 
-/* USUARIOS */
-function guardarUsuario(){
-let n=userNombre.value,p=userPass.value;
+/* =========================
+USUARIOS
+========================= */
 
-if(editUser==null){
-usuarios.push({nombre:n,pass:p});
+function guardarUsuario(){
+
+let n = document.getElementById("userNombre").value.trim();
+
+let p = document.getElementById("userPass").value.trim();
+
+if(n === "" || p === ""){
+
+alert("Completa todos los campos");
+
+return;
+
+}
+
+if(editUser == null){
+
+usuarios.push({
+
+nombre:n,
+pass:p
+
+});
+
 }else{
-usuarios[editUser]={nombre:n,pass:p};
-editUser=null;
+
+usuarios[editUser] = {
+
+nombre:n,
+pass:p
+
+};
+
+editUser = null;
+
 }
 
 localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
 mostrarUsuarios();
+
 limpiarUsuarios();
+
 }
 
 function mostrarUsuarios(){
-listaUsuarios.innerHTML="";
+
+let listaUsuarios = document.getElementById("listaUsuarios");
+
+listaUsuarios.innerHTML = "";
+
 usuarios.forEach((u,i)=>{
-listaUsuarios.innerHTML+=`
+
+listaUsuarios.innerHTML += `
+
 <div class="item">
+
 <p><strong>${u.nombre}</strong></p>
+
 <p>${u.pass}</p>
 
-<button onclick="editarUsuario(${i})">✏️ Editar</button>
-<button onclick="eliminarUsuario(${i})">❌ Eliminar</button>
-</div>`;
+<button onclick="editarUsuario(${i})">
+✏️ Editar
+</button>
+
+<button onclick="eliminarUsuario(${i})">
+❌ Eliminar
+</button>
+
+</div>
+
+`;
+
 });
+
 }
 
 function editarUsuario(i){
-let u=usuarios[i];
-userNombre.value=u.nombre;
-userPass.value=u.pass;
-editUser=i;
+
+let u = usuarios[i];
+
+document.getElementById("userNombre").value = u.nombre;
+
+document.getElementById("userPass").value = u.pass;
+
+editUser = i;
+
 }
 
 function eliminarUsuario(i){
+
 if(confirm("¿Eliminar usuario?")){
+
 usuarios.splice(i,1);
+
 localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
 mostrarUsuarios();
+
 }
+
 }
 
 function limpiarUsuarios(){
-userNombre.value="";
-userPass.value="";
+
+document.getElementById("userNombre").value = "";
+
+document.getElementById("userPass").value = "";
+
 }
 
-/* INIT */
+/* =========================
+REPORTES
+========================= */
+
+function actualizarReportes(){
+
+document.getElementById("repProductos").innerText = productos.length;
+
+document.getElementById("repCarrito").innerText = carrito.length;
+
+let total = 0;
+
+carrito.forEach(p=>{
+
+total += Number(p.precio);
+
+});
+
+document.getElementById("repVentas").innerText = total;
+
+}
+
+/* =========================
+INICIO
+========================= */
+
 mostrar();
+
 mostrarCarrito();
+
 mostrarUsuarios();
+
+actualizarReportes();
+
 </script>
 
 </body>

@@ -8,7 +8,7 @@ body {
 /* SIDEBAR */
 .sidebar {
     width: 240px;
-    background: #d8c4f7; /* lila pastel */
+    background: hsl(264, 20%, 71%); /* lila pastel */
     color: #333;
     height: 100vh;
     padding: 20px;

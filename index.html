@@ -1,93 +1,444 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
-<title>Login SofSport</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login - SofSport PRO</title>
 
 <style>
-body{
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-background:#f5f6fa;
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:'Segoe UI';
 }
 
-/* CAJA */
-.box{
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#7b2ff7,#a100ff);
+padding:20px;
+}
+
+.login-box{
 background:white;
-padding:35px;
-border-radius:15px;
-box-shadow:0 6px 15px rgba(0,0,0,0.1);
+padding:40px;
+border-radius:20px;
+width:380px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
 text-align:center;
-width:300px;
 }
 
-/* LOGO */
 .logo{
-width:90px;
-border-radius:50%;
-margin-bottom:10px;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
+width:100px;
+height:100px;
+margin-bottom:15px;
+object-fit:contain;
 }
 
-/* INPUTS */
+.login-box h1{
+margin-bottom:20px;
+color:#7b2ff7;
+}
+
+#apiStatus{
+margin-bottom:15px;
+font-size:13px;
+font-weight:bold;
+}
+
+.ok{
+color:green;
+}
+
+.err{
+color:red;
+}
+
 input{
-display:block;
-margin:10px auto;
-padding:10px;
-width:90%;
-border-radius:8px;
+width:100%;
+padding:12px;
+margin:10px 0;
 border:1px solid #ccc;
+border-radius:8px;
+font-size:15px;
+outline:none;
 }
 
-/* BOTON */
+input:focus{
+border-color:#7b2ff7;
+}
+
 button{
-margin-top:10px;
-padding:10px;
-width:95%;
-background:#935ceb;
-color:white;
+width:100%;
+padding:12px;
 border:none;
+background:#7b2ff7;
+color:white;
+font-size:16px;
 border-radius:8px;
 cursor:pointer;
-font-size:15px;
+transition:0.3s;
+margin-top:10px;
 }
 
 button:hover{
-background:#5a1fd1;
+background:#5e22bf;
 }
+
+.link{
+margin-top:12px;
+display:block;
+color:#7b2ff7;
+cursor:pointer;
+font-size:14px;
+}
+
+.error{
+color:red;
+margin-top:10px;
+font-size:14px;
+}
+
+.success{
+color:green;
+font-size:14px;
+margin-top:10px;
+}
+
+.form-hidden{
+display:none;
+margin-top:20px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="box">
+<div class="login-box">
 
-<!-- LOGO -->
-<img src="sofia.img.png" class="logo">
+<img 
+src="sofia.img.png"
+class="logo"
+alt="logo">
 
-<h2>SofSport</h2>
-<p>Iniciar sesión</p>
+<h1>SofSport PRO</h1>
 
-<input id="user" placeholder="Usuario">
-<input id="pass" type="password" placeholder="Contraseña">
+<p id="apiStatus">⏳ Verificando API...</p>
 
-<button onclick="login()">Ingresar</button>
+<!-- LOGIN -->
+
+<input type="email" id="correo" placeholder="Correo electrónico">
+
+<input type="password" id="password" placeholder="Contraseña">
+
+<button onclick="login()">
+Iniciar sesión
+</button>
+
+<p id="mensaje" class="error"></p>
+
+<!-- LINKS -->
+
+<span class="link" onclick="mostrarRegistro()">
+Crear usuario
+</span>
+
+<span class="link" onclick="mostrarRecuperar()">
+¿Olvidaste tu contraseña?
+</span>
+
+<!-- REGISTRO -->
+
+<div id="registroForm" class="form-hidden">
+
+<h3>Crear Usuario</h3>
+
+<input type="text" id="nuevoNombre" placeholder="Nombre">
+
+<input type="email" id="nuevoCorreo" placeholder="Correo">
+
+<input type="password" id="nuevoPass" placeholder="Contraseña">
+
+<button onclick="registrarUsuario()">
+Registrar
+</button>
+
+<p id="registroMsg"></p>
+
+</div>
+
+<!-- RECUPERAR -->
+
+<div id="recuperarForm" class="form-hidden">
+
+<h3>Recuperar Contraseña</h3>
+
+<input type="email" id="correoRecuperar" placeholder="Correo">
+
+<button onclick="recuperarPass()">
+Recuperar
+</button>
+
+<p id="recuperarMsg"></p>
+
+</div>
 
 </div>
 
 <script>
-function login(){
-let user=document.getElementById("user").value;
 
-/* GUARDA SESION */
-localStorage.setItem("sesion",user||"admin");
+const API = "http://localhost:9090/api";
 
-/* IR AL DASHBOARD */
-window.location="dashboard.html";
+/* VERIFICAR API */
+
+(async () => {
+
+let status = document.getElementById("apiStatus");
+
+try{
+
+const r = await fetch(`${API}/usuarios`);
+
+if(r.ok){
+
+status.innerText = "🟢 API conectada";
+status.className = "ok";
+
+}else{
+
+status.innerText = "🔴 API no responde";
+status.className = "err";
+
 }
+
+}catch(error){
+
+console.log(error);
+
+status.innerText = "🔴 API offline";
+status.className = "err";
+
+}
+
+})();
+
+/* SI YA HAY SESION */
+
+if(localStorage.getItem("sesion")){
+
+window.location.href = "dashboard.html";
+
+}
+
+/* LOGIN */
+
+async function login(){
+
+let correo = document.getElementById("correo").value.trim();
+
+let password = document.getElementById("password").value.trim();
+
+let mensaje = document.getElementById("mensaje");
+
+mensaje.innerText = "";
+
+if(correo === "" || password === ""){
+
+mensaje.innerText = "Completa todos los campos";
+
+return;
+
+}
+
+if(!correo.includes("@")){
+
+mensaje.innerText = "Correo inválido";
+
+return;
+
+}
+
+try{
+
+const respuesta = await fetch(`${API}/usuarios`);
+
+const usuarios = await respuesta.json();
+
+const usuario = usuarios.find(u => 
+u.correo === correo
+);
+
+if(usuario){
+
+localStorage.setItem("sesion","activa");
+
+localStorage.setItem("usuario",usuario.nombre);
+
+window.location.href = "dashboard.html";
+
+}else{
+
+mensaje.innerText = "Usuario no encontrado";
+
+}
+
+}catch(error){
+
+console.log(error);
+
+mensaje.innerText = "No se pudo conectar con la API";
+
+}
+
+}
+
+/* MOSTRAR REGISTRO */
+
+function mostrarRegistro(){
+
+let form = document.getElementById("registroForm");
+
+if(form.style.display === "block"){
+
+form.style.display = "none";
+
+}else{
+
+form.style.display = "block";
+
+}
+
+}
+
+/* MOSTRAR RECUPERAR */
+
+function mostrarRecuperar(){
+
+let form = document.getElementById("recuperarForm");
+
+if(form.style.display === "block"){
+
+form.style.display = "none";
+
+}else{
+
+form.style.display = "block";
+
+}
+
+}
+
+/* REGISTRAR */
+
+async function registrarUsuario(){
+
+let nombre = document.getElementById("nuevoNombre").value.trim();
+
+let correo = document.getElementById("nuevoCorreo").value.trim();
+
+let pass = document.getElementById("nuevoPass").value.trim();
+
+let msg = document.getElementById("registroMsg");
+
+msg.innerHTML = "";
+
+if(nombre === "" || correo === "" || pass === ""){
+
+msg.innerHTML = "<span class='error'>Completa todos los campos</span>";
+
+return;
+
+}
+
+if(!correo.includes("@")){
+
+msg.innerHTML = "<span class='error'>Correo inválido</span>";
+
+return;
+
+}
+
+try{
+
+const res = await fetch(`${API}/usuarios`,{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body: JSON.stringify({
+nombre:nombre,
+correo:correo,
+edad:18
+})
+
+});
+
+if(res.ok){
+
+msg.innerHTML = "<span class='success'>Usuario registrado correctamente</span>";
+
+document.getElementById("nuevoNombre").value = "";
+document.getElementById("nuevoCorreo").value = "";
+document.getElementById("nuevoPass").value = "";
+
+}else{
+
+msg.innerHTML = "<span class='error'>Error al registrar</span>";
+
+}
+
+}catch(error){
+
+console.log(error);
+
+msg.innerHTML = "<span class='error'>No se pudo conectar con la API</span>";
+
+}
+
+}
+
+/* RECUPERAR */
+
+function recuperarPass(){
+
+let correo = document.getElementById("correoRecuperar").value.trim();
+
+let msg = document.getElementById("recuperarMsg");
+
+msg.innerHTML = "";
+
+if(correo === ""){
+
+msg.innerHTML = "<span class='error'>Ingresa un correo</span>";
+
+return;
+
+}
+
+if(!correo.includes("@")){
+
+msg.innerHTML = "<span class='error'>Correo inválido</span>";
+
+return;
+
+}
+
+msg.innerHTML = "<span class='success'>Se envió un enlace de recuperación</span>";
+
+}
+
 </script>
 
 </body>
